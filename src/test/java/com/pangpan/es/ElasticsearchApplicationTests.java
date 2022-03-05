@@ -77,8 +77,8 @@ class ElasticsearchApplicationTests {
         //查询
 //        get(client);
         getAll(client);
-//        update(client);
-        //delete(client);
+        update(client);
+        delete(client);
         client.close();
         System.out.println(client);
         //Add transport addresses and do something with the client...
@@ -198,13 +198,15 @@ class ElasticsearchApplicationTests {
 
         SearchResponse response = client.prepareSearch("product2")
                 .setQuery(QueryBuilders.termQuery("name", "xiaomi"))                 // Query
-                .setPostFilter(QueryBuilders.rangeQuery("price").from(0).to(4000))
+                .setPostFilter(QueryBuilders.rangeQuery("price").from(0).to(5000))
                 .setFrom(1).setSize(3)
                 .get();
         SearchHits searchHits = response.getHits();
+
         SearchHit[] hits = searchHits.getHits();
         for (SearchHit hit : hits) {
             String res = hit.getSourceAsString();
+            System.out.println("version="+hit.getVersion());
             System.out.println("res" + res);
         }
         client.close();
@@ -232,7 +234,7 @@ class ElasticsearchApplicationTests {
         //region 2->计算并返回聚合分析response对象
         SearchResponse response = client.prepareSearch("product2")
                 .addAggregation(
-                        AggregationBuilders.dateHistogram("group_by_month")
+                        AggregationBuilders.dateHistogram("group_by_month")//给聚合取名
                                 .field("date")
                                 .calendarInterval(DateHistogramInterval.MONTH)
 //                                .dateHistogramInterval(DateHistogramInterval.MONTH)
